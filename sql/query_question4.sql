@@ -1,21 +1,47 @@
-WITH Coauthor AS (
-    SELECT
-        R_author.author AS author,
-        COUNT(DISTINCT article._key) AS article_coauthor_count,
-        COUNT(DISTINCT in_._key) AS in_coauthor_count
-    FROM
-        R_author
-        LEFT JOIN article ON R_author._key = article._key AND article.journal LIKE '%data%'
-        LEFT JOIN in_ ON R_author._key = in_._key AND in_.booktitle LIKE '%data%'
-    GROUP BY
-        R_author.author
-)
+USE dblp;
 
+DROP VIEW IF EXISTS data_article;
+DROP TABLE IF EXISTS Coauthor; 
+
+CREATE VIEW data_article AS (
+    SELECT
+        article._key 
+    FROM 
+        article
+    WHERE
+        article.journal LIKE '%data%' OR article.journal LIKE '%Data%'
+    UNION
+    SELECT
+        in_._key 
+    FROM 
+        in_
+    WHERE
+        in_.booktitle LIKE '%data%' OR in_.booktitle LIKE '%Data%'
+);
+
+CREATE Temporary TABLE Coauthor AS (
+    SELECT
+        ra1.author AS author,
+        ra2.author AS coauthor
+    FROM
+        data_article da
+        JOIN R_author ra1 ON da._key = ra1._key
+        JOIN R_author ra2 ON da._key = ra2._key
+    WHERE
+        ra1.author <> ra2.author
+);
+
+
+-- Query using the Temporary Tables
 SELECT
-    author,
-    COALESCE(article_coauthor_count, 0) + COALESCE(in_coauthor_count, 0) AS total_coauthor_count
+    Coauthor.author,
+    COUNT(DISTINCT coauthor) AS coauthor_count
 FROM
     Coauthor
-WHERE
-     COALESCE(article_coauthor_count, 0) + COALESCE(in_coauthor_count, 0) >= ALL (SELECT COALESCE(article_coauthor_count, 0) + COALESCE(in_coauthor_count, 0)
-                                                                                  FROM Coauthor)
+GROUP BY
+    Coauthor.author
+order by
+	coauthor_count DESC
+Limit
+	1
+;

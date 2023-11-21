@@ -1,8 +1,10 @@
-WITH DistinctYears AS (
+DROP TABLE DistinctYears IF EXISTS;
+
+CREATE Temporary TABLE DistinctYears AS (
   SELECT DISTINCT year
   FROM publish
   WHERE year >= 1970
-)
+);
 
 SELECT
   CONCAT(FLOOR(d.year / 10) * 10, ' - ', FLOOR(d.year / 10) * 10 + 9) AS YearRange,
