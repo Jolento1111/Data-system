@@ -16,7 +16,8 @@ CREATE TABLE publish (
     series VARCHAR(255),
     ee VARCHAR(255),
     _url VARCHAR(255),
-    isbn VARCHAR(255)
+    isbn VARCHAR(255),
+    _type VARCHAR(255)
 );
 
 

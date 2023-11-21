@@ -1,10 +1,10 @@
--- CREATE TABLES article
+-- CREATE TABLES R_author
 USE `dblp`;
 
--- drop article table
+-- drop R_author table if exists
 DROP TABLE IF EXISTS R_author; 
 
--- create article table
+-- create R_author table
 CREATE TABLE R_author (
     _key VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL
