@@ -1,7 +1,14 @@
+-- Query Description:
+-- List the name of the conferences such that it has ever been held in June, and the corresponding
+-- proceedings (in the year where the conference was held in June) contain more than 100 publications.
 use dblp;
-SELECT p.booktitle AS ConferenceName, COUNT(a.`key`) AS PublicationCount, YEAR(p.mdate) AS ConferenceYear
+SELECT p.title, p.booktitle, p.year, COUNT(*) AS publication_count
 FROM publish p
-JOIN article a ON a.journal = p.booktitle AND a.year = YEAR(p.mdate)
-WHERE MONTH(p.mdate) = 6
-GROUP BY p.booktitle, YEAR(p.mdate)
-HAVING COUNT(a.`key`) > 100;
+	JOIN in_ i ON p._key = i.crossref
+WHERE
+    p.title LIKE '%June%'
+        AND SUBSTRING_INDEX(p._key, '/', 1) = 'conf'
+GROUP BY p.title , p.booktitle , p.year
+HAVING COUNT(*) > 100;
+
+

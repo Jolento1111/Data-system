@@ -1,10 +1,7 @@
--- CREATE TABLES article
 USE `dblp`;
 
--- drop article table
 DROP TABLE IF EXISTS in_; 
 
--- create article table
 CREATE TABLE in_ (
     _key VARCHAR(255) NOT NULL,
     mdate DATE NOT NULL,
@@ -16,5 +13,3 @@ CREATE TABLE in_ (
     _url VARCHAR(255),
     _type VARCHAR(255)
 );
-
-

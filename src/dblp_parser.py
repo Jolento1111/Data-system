@@ -1,3 +1,7 @@
+##########################################################
+# main reference: https://github.com/26hzhang/DBLPParser #
+##########################################################
+
 from lxml import etree
 from datetime import datetime
 import csv
@@ -17,11 +21,9 @@ def log_msg(message):
     """Produce a log with current time"""
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), message)
 
-
 def context_iter(dblp_path):
     """Create a dblp data iterator of (event, element) pairs for processing"""
     return etree.iterparse(source=dblp_path, dtd_validation=True, load_dtd=True)  # required dtd
-
 
 def clear_element(element):
     """Free up memory for temporary element tree after processing the element"""
@@ -29,35 +31,7 @@ def clear_element(element):
     while element.getprevious() is not None:
         del element.getparent()[0]
 
-
 def count_pages(pages):
-    """Borrowed from: https://github.com/billjh/dblp-iter-parser/blob/master/iter_parser.py
-    Parse pages string and count number of pages. There might be multiple pages separated by commas.
-    VALID FORMATS:
-        51         -> Single number
-        23-43      -> Range by two numbers
-    NON-DIGITS ARE ALLOWED BUT IGNORED:
-        AG83-AG120
-        90210H     -> Containing alphabets
-        8e:1-8e:4
-        11:12-21   -> Containing colons
-        P1.35      -> Containing dots
-        S2/109     -> Containing slashes
-        2-3&4      -> Containing ampersands and more...
-    INVALID FORMATS:
-        I-XXI      -> Roman numerals are not recognized
-        0-         -> Incomplete range
-        91A-91A-3  -> More than one dash
-        f          -> No digits
-    ALGORITHM:
-        1) Split the string by comma evaluated each part with (2).
-        2) Split the part to subparts by dash. If more than two subparts, evaluate to zero. If have two subparts,
-           evaluate by (3). If have one subpart, evaluate by (4).
-        3) For both subparts, convert to number by (4). If not successful in either subpart, return zero. Subtract first
-           to second, if negative, return zero; else return (second - first + 1) as page count.
-        4) Search for number consist of digits. Only take the last one (P17.23 -> 23). Return page count as 1 for (2)
-           if find; 0 for (2) if not find. Return the number for (3) if find; -1 for (3) if not find.
-    """
     cnt = 0
     for part in re.compile(r",").split(pages):
         subparts = re.compile(r"-").split(part)
@@ -146,8 +120,6 @@ def parse_entity(dblp_path, save_path, type_name, features=None, save_to_csv=Fal
             ujson.dump(results, f)
     return full_entity, part_entity, attrib_count
 
-
-
 def parse_article(dblp_path, save_path, save_to_csv=False, include_key=False, include_publtype=False):
     type_name = ['article']
     features = ['title', 'author', 'year', 'journal', 'ee', 'url']
@@ -156,7 +128,6 @@ def parse_article(dblp_path, save_path, save_to_csv=False, include_key=False, in
             .format(info[0] + info[1], info[0], info[1]))
     log_msg("Features information: {}".format(str(info[2])))
 
-
 def parse_inproceedings(dblp_path, save_path, save_to_csv=False, include_key=False, include_publtype=False):
     type_name = ["inproceedings"]
     features = ['title', 'author', 'year', 'crossref', 'booktitle', 'ee', 'url']
@@ -164,7 +135,6 @@ def parse_inproceedings(dblp_path, save_path, save_to_csv=False, include_key=Fal
     log_msg('Total inproceedings found: {}, inproceedings contain all features: {}, inproceedings contain part of '
             'features: {}'.format(info[0] + info[1], info[0], info[1]))
     log_msg("Features information: {}".format(str(info[2])))
-
 
 def parse_www(dblp_path, save_path, save_to_csv=False, include_key=False, include_publtype=False):
     type_name = ["www"]
@@ -198,8 +168,6 @@ def parse_incollection(dblp_path, save_path, save_to_csv=False, include_key=Fals
             'features: {}'.format(info[0] + info[1], info[0], info[1]))
     log_msg("Features information: {}".format(str(info[2])))
 
-
-
 def parse_proceedings(dblp_path, save_path, save_to_csv=False, include_key=False, include_publtype=False):
     type_name = ["proceedings"]
     features = ['title', 'editor', 'year', 'publisher', 'booktitle', 'volume', 'series', 'ee',  'url', 'isbn']
@@ -208,7 +176,6 @@ def parse_proceedings(dblp_path, save_path, save_to_csv=False, include_key=False
             'features: {}'.format(info[0] + info[1], info[0], info[1]))
     log_msg("Features information: {}".format(str(info[2])))
 
-
 def parse_book(dblp_path, save_path, save_to_csv=False, include_key=False, include_publtype=False):
     type_name = ["book"]
     features = ['title', 'editor', 'year', 'publisher', 'booktitle', 'volume', 'series', 'ee',  'url', 'isbn']
@@ -216,7 +183,6 @@ def parse_book(dblp_path, save_path, save_to_csv=False, include_key=False, inclu
     log_msg('Total books found: {}, books contain all features: {}, books contain part of features: {}'
             .format(info[0] + info[1], info[0], info[1]))
     log_msg("Features information: {}".format(str(info[2])))
-
 
 def parse_publications(dblp_path, save_path, save_to_csv=False, include_key=False, include_publtype=False):
     type_name = ['article', 'book', 'incollection', 'inproceedings']
@@ -234,7 +200,6 @@ def parse_author(dblp_path, save_path, save_to_csv=False):
         if elem.tag in type_name:
             authors.add((elem.text, elem.attrib['orcid'] if 'orcid' in elem.keys() else ''))
         clear_element(elem)
-
     if save_to_csv:
         f = open(save_path, 'w', newline='', encoding='utf8')
         writer = csv.writer(f, delimiter=',')
@@ -244,10 +209,7 @@ def parse_author(dblp_path, save_path, save_to_csv=False):
     else:
         with open(save_path, 'w', encoding='utf8') as f:
             f.write(ujson.dumps([{'name':a[0], 'orcid':a[1]} for a in list(authors)],indent=2, ensure_ascii=False))
-
     log_msg("FINISHED...")
-
-
 
 
 def main():

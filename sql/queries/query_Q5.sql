@@ -1,17 +1,28 @@
-use dblp;
-SELECT author_name, COUNT(*) AS publication_count
-FROM (
-    SELECT
-        SUBSTRING_INDEX(SUBSTRING_INDEX(art.author, '::', numbers.n), '::', -1) AS author_name
-    FROM
-        dblp.article AS art
-    JOIN
-        (SELECT 1 n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) numbers
-        ON LENGTH(art.author) - LENGTH(REPLACE(art.author, '::', '')) >= (numbers.n - 1) * 2
+-- Query Description:
+-- Data analytics and data science are very popular topics. Find the top 10 authors with the largest
+-- number of publications that are published in conferences and journals whose titles contain word “Data” in the last 5 years.
+
+USE dblp;
+SELECT 
+    ra.author, COUNT(*) AS publication_count
+FROM
+    (SELECT a._key
+    FROM article a
     WHERE
-        art.title LIKE '%Data%'
-        AND art.year >= YEAR(CURDATE()) - 5
-) AS split_authors
-GROUP BY author_name
+        a.journal LIKE '%Data%'
+            AND a.publtype IS NULL
+            AND (SUBSTRING_INDEX(a._key, '/', 1) = 'conf' OR SUBSTRING_INDEX(a._key, '/', 1) = 'journals')
+            AND a.year >= YEAR(CURDATE()) - 5 
+	UNION ALL 
+    SELECT I._key
+    FROM in_ I
+    JOIN publish P ON I.crossref = P._key
+    WHERE
+        SUBSTRING_INDEX(I._key, '/', 1) = 'conf'
+            AND P.title LIKE '%Data%'
+            AND I.year >= YEAR(CURDATE()) - 5) AS publication_keys
+        JOIN
+    R_author ra ON publication_keys._key = ra._key
+GROUP BY ra.author
 ORDER BY publication_count DESC
 LIMIT 10;

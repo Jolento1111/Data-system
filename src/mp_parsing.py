@@ -7,7 +7,6 @@ import time
 import math
 
 
-
 def mp_parsing():
     dblp_path = '../data/dblp.xml'
     save_path_article = '../data/csv_files/article.csv'
@@ -19,7 +18,6 @@ def mp_parsing():
     save_path_proceedings = '../data/csv_files/proceedings.csv'
     save_path_book = '../data/csv_files/book.csv'
     save_path_author = '../data/csv_files/authors_orcid.csv'
-
 
     try:
         context_iter(dblp_path)
@@ -59,7 +57,6 @@ def mp_parsing():
     t_end = time.time()
 
     print('Time consumption of multiprocess parsing: {}m{}s'.format(math.floor((t_end-t_start)/60), (t_end-t_start) % 60))
-
     
 if __name__ == '__main__':
     mp_parsing()

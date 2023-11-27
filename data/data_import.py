@@ -1,5 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
+import os
 
 def csv2sql_dblp(_csv_address, table, database = 'dblp'):
     #  change the connection, username and password to your own
@@ -15,8 +16,7 @@ def csv2sql_dblp(_csv_address, table, database = 'dblp'):
     print(f"Data has been imported to mysql table {database}.{table}")
 
 def read_data(file):
-    return 'csv_files/'+file
-
+    return os.path.join(os.getcwd(),'csv_files',file)
 
 # before runing this file, you should create a database named 'dblp' in mysql, then execute the given sql files to create tables
 # and make sure the tables are empty to avoid duplicate data

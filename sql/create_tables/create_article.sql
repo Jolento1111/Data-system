@@ -1,10 +1,7 @@
--- CREATE TABLES article
 USE `dblp`;
 
--- drop article table
 DROP TABLE IF EXISTS article; 
 
--- create article table
 CREATE TABLE article (
     _key VARCHAR(255) NOT NULL,
     mdate DATE NOT NULL,
